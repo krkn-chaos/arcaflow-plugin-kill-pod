@@ -4,11 +4,12 @@ import string
 import threading
 import unittest
 
-import arcaflow_plugin_kill_pod
 from arcaflow_plugin_sdk import plugin
 from kubernetes import client
 from kubernetes.client import (ApiException, V1Container, V1ObjectMeta, V1Pod,
                                V1PodSpec)
+
+import arcaflow_plugin_kill_pod
 
 
 class KillPodTest(unittest.TestCase):
