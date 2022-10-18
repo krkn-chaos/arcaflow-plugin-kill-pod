@@ -2,7 +2,7 @@ name: Carpentry
 on:
   pull_request:
 env:
-  IMAGE_NAME: arcaflow-plugin-template-python
+  IMAGE_NAME: arcaflow-plugin-kill-pod
   IMAGE_TAG: 'dev-build'
   GITHUB_USERNAME: ${{ github.actor }}
   GITHUB_PASSWORD: ${{ secrets.GITHUB_TOKEN }}

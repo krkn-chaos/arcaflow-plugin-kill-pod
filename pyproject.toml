@@ -1,20 +1,27 @@
-[tool.poetry]
-name = "arcaflow-plugin-template-python"
-version = "0.1.0"
-description = ""
-authors = ["Arcalot"]
-license = "Apache-2.0+GPL-2.0-only"
-
-[tool.poetry.dependencies]
-python = "^3.9"
-arcaflow-plugin-sdk = "0.8.0"
-
-[tool.poetry.dev-dependencies]
-docformatter = "^1.5.0"
-autoflake = "^1.7.6"
-pydocstyle = "^6.1.1"
-black = "^22.10.0"
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arcaflow_plugin_kill_pod"
+# Do not change, the version is automatically updated in CI.
+version = "0.0.0"
+authors = [
+]
+description = "Chaos Engineering Kill Pod Plugin for Arcaflow"
+readme = "README.md"
+license = { text="Apache-2.0" }
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+  'arcaflow-plugin-sdk >= 0.8.0',
+  'kubernetes',
+]
+
+[project.urls]
+"Homepage" = "https://github.com/arcalotarcaflow-plugin-kill-pod"
+"Bug Tracker" = "https://github.com/arcalot/arcaflow-plugin-kill-pod/issues"

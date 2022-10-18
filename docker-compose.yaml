@@ -1,9 +1,5 @@
 version: '3.2'
 services:
   plugin:
-    image: ghcr.io/arcalot/arcaflow-plugin-template
+    image: ghcr.io/arcalot/arcaflow-plugin-kill-pod
     build: .
-    volumes:
-      - source: ./example.yaml
-        target: /config/example.yaml
-        type: bind
