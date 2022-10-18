@@ -1,16 +1,16 @@
 #!/usr/bin/env python
+import random
 import re
 import sys
 import time
 import typing
 from dataclasses import dataclass, field
-import random
 from datetime import datetime
 from traceback import format_exc
 
-from kubernetes import config, client
-from kubernetes.client import V1PodList, V1Pod, ApiException, V1DeleteOptions
-from arcaflow_plugin_sdk import validation, plugin, schema
+from arcaflow_plugin_sdk import plugin, validation
+from kubernetes import client, config
+from kubernetes.client import ApiException, V1DeleteOptions, V1Pod, V1PodList
 
 
 def setup_kubernetes(kubeconfig_path):
@@ -175,6 +175,8 @@ def kill_pods(cfg: KillPodConfig) -> typing.Tuple[str, typing.Union[PodKillSucce
                 for p in watch_pods:
                     try:
                         read_pod = core_v1.read_namespaced_pod(p.name, p.namespace)
+                        if (read_pod.metadata.name != p.name):
+                            return "error", PodErrorOutput("Error retrieveing pod {}".format(p.name))
                         new_watch_pods.append(p)
                     except ApiException as e:
                         if e.status != 404:
