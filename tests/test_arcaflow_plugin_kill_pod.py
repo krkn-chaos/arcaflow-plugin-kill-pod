@@ -6,7 +6,9 @@ import unittest
 
 from arcaflow_plugin_sdk import plugin
 from kubernetes import client
-from kubernetes.client import ApiException, V1Container, V1ObjectMeta, V1Pod, V1PodSpec
+from kubernetes.client import (ApiException, V1Container, V1ObjectMeta, V1Pod,
+                               V1PodSpec, V1SeccompProfile,
+                               V1SecurityContext, V1Capabilities)
 
 import arcaflow_plugin_kill_pod
 
@@ -43,23 +45,42 @@ class KillPodTest(unittest.TestCase):
     def test_kill_pod(self):
         with arcaflow_plugin_kill_pod.setup_kubernetes(None) as cli:
             core_v1 = client.CoreV1Api(cli)
-            pod = core_v1.create_namespaced_pod(
-                "default",
-                V1Pod(
-                    metadata=V1ObjectMeta(
-                        generate_name="test-",
-                    ),
-                    spec=V1PodSpec(
+            pod = core_v1.create_namespaced_pod("default", V1Pod(
+                metadata=V1ObjectMeta(
+                    generate_name="test-",
+                ),
+                spec=V1PodSpec(
+                        security_context=V1SecurityContext(
+                                    run_as_non_root=True,
+                                    run_as_group=3000,
+                                    run_as_user=2000
+                                ),
                         containers=[
                             V1Container(
                                 name="test",
                                 image="alpine",
                                 tty=True,
+                                security_context=V1SecurityContext(
+                                    run_as_non_root=True,
+                                    seccomp_profile=V1SeccompProfile(type="RuntimeDefault"),
+                                    allow_privilege_escalation=False,
+                                    capabilities=V1Capabilities(drop=["ALL"])
+                                )
                             )
                         ]
-                    ),
-                ),
+                    )
+                )
             )
+            pods = arcaflow_plugin_kill_pod._find_pods(core_v1, None,
+                    namespace_pattern=re.compile("^default$"),
+                    name_pattern=re.compile(
+                        "^" + re.escape(pod.metadata.name) + "$"
+                    ))
+            while len(pods) != 0:
+                pods = core_v1._find_pods(core_v1, None, namespace_pattern=re.compile("^default$"),
+                    name_pattern=re.compile(
+                            "^" + re.escape(pod.metadata.name) + "$"
+                    ))
 
             def remove_test_pod():
                 try:
@@ -87,6 +108,7 @@ class KillPodTest(unittest.TestCase):
             out: arcaflow_plugin_kill_pod.PodKillSuccessOutput = output_data
             self.assertEqual(1, len(out.pods))
             pod_list = list(out.pods.values())
+
             self.assertEqual(pod.metadata.name, pod_list[0].name)
 
             try:
@@ -137,22 +159,31 @@ class WaitForPodTest(unittest.TestCase):
             name = "watch-test-" + "".join(random.choices(string.ascii_lowercase, k=8))
 
             def create_test_pod():
-                core_v1.create_namespaced_pod(
-                    "default",
-                    V1Pod(
-                        metadata=V1ObjectMeta(
-                            name=name,
-                        ),
-                        spec=V1PodSpec(
-                            containers=[
-                                V1Container(
-                                    name="test",
-                                    image="alpine",
-                                    tty=True,
-                                )
-                            ]
-                        ),
+                core_v1.create_namespaced_pod("default", V1Pod(
+                    metadata=V1ObjectMeta(
+                        name=name
                     ),
+                    spec=V1PodSpec(
+                        security_context=V1SecurityContext(
+                                    run_as_non_root=True,
+                                    run_as_group=3000,
+                                    run_as_user=2000
+                                ),
+                        containers=[
+                            V1Container(
+                                name="test",
+                                image="alpine",
+                                tty=True,
+                                security_context=V1SecurityContext(
+                                    run_as_non_root=True,
+                                    seccomp_profile=V1SeccompProfile(type="RuntimeDefault"),
+                                    allow_privilege_escalation=False,
+                                    capabilities=V1Capabilities(drop=["ALL"])
+                                )
+                            )
+                        ]
+                    ),
+                    )
                 )
 
             def remove_test_pod():
@@ -177,5 +208,5 @@ class WaitForPodTest(unittest.TestCase):
             self.assertEqual("success", output_id)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

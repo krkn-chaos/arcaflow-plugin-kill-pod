@@ -36,7 +36,10 @@ def _find_pods(core_v1, label_selector, name_pattern, namespace_pattern):
     finished = False
     while not finished:
         pod_response: V1PodList = core_v1.list_pod_for_all_namespaces(
-            watch=False, label_selector=label_selector
+            watch=False,
+            label_selector=label_selector,
+            field_selector="status.phase=Running",
+            _continue=_continue
         )
         for pod in pod_response.items:
             pod: V1Pod
