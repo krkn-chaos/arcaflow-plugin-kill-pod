@@ -1,2 +1,0 @@
-arcaflow-plugin-sdk>=0.8.0; python_version >= "3.9"
-kubernetes
