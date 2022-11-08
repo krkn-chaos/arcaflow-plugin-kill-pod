@@ -1,13 +1,16 @@
 FROM quay.io/centos/centos:stream8
 
-RUN dnf -y module install python39 && dnf -y install python39 python39-pip
+RUN dnf -y module enable python39 && dnf --setopt=tsflags=nodocs -y install python39-3.9.7 python39-pip-20.2.4 && dnf clean all
 RUN mkdir /app
 ADD https://raw.githubusercontent.com/arcalot/arcaflow-plugin-template-python/main/LICENSE /app
-ADD arcaflow_plugin_kill_pod.py /app
-ADD requirements.txt /app
+COPY README.md /app/
+COPY arcaflow_plugin_kill_pod.py /app
+COPY poetry.lock pyproject.toml /app/
 WORKDIR /app
 
-RUN pip3 install -r requirements.txt
+RUN pip3 install --no-cache-dir poetry==1.2.2 && \
+    poetry config virtualenvs.create false && \
+    poetry install --only main
 
 ENTRYPOINT ["python3", "/app/arcaflow_plugin_kill_pod.py"]
 CMD []

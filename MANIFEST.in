@@ -1,5 +1,0 @@
-include docker-compose.yaml
-include Dockerfile
-include pyproject.toml
-include requirements.txt
-recursive-include tests *.py

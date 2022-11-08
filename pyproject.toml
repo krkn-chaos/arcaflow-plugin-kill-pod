@@ -1,27 +1,37 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "arcaflow_plugin_kill_pod"
 # Do not change, the version is automatically updated in CI.
 version = "0.0.0"
-authors = [
-]
 description = "Chaos Engineering Kill Pod Plugin for Arcaflow"
+authors = []
 readme = "README.md"
-license = { text="Apache-2.0" }
-requires-python = ">=3.9"
+license = "Apache-2.0"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
-dependencies = [
-  'arcaflow-plugin-sdk >= 0.8.0',
-  'kubernetes',
+homepage = "https://github.com/arcalotarcaflow-plugin-kill-pod"
+
+packages = [
+   { include="arcaflow_plugin_kill_pod.py", from="."  },
+]
+include = [
+   { path="docker-compose.yaml", format="sdist" },
+   { path="tests", format="sdist" },
+   { path="poetry.lock", format="sdist" },
+   { path="Dockerfile", format="sdist" },
 ]
 
-[project.urls]
-"Homepage" = "https://github.com/arcalotarcaflow-plugin-kill-pod"
-"Bug Tracker" = "https://github.com/arcalot/arcaflow-plugin-kill-pod/issues"
+[tool.poetry.dependencies]
+python = "^3.9"
+arcaflow-plugin-sdk = "^0.9.0"
+kubernetes = "^25.3.0"
+
+[tool.poetry.dev-dependencies]
+coverage = "^6.5.0"
+pre-commit = "^2.20.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

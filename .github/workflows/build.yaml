@@ -19,24 +19,22 @@ jobs:
           python-version: '3.9'
           architecture: 'x64'
       - name: Install build tools
-        run: python3 -m pip install --upgrade build
+        run: python3 -m pip install --upgrade poetry
       - name: Test python build
-        run: python3 -m build
+        run: poetry build
       - name: Upload built artifacts
         uses: actions/upload-artifact@v3
         with:
           name: builds
           path: dist
           if-no-files-found: error
-      - name: Install test tools
-        run: python3 -m pip install coverage
-      - name: Install depedencies
-        run: python3 -m pip install -r requirements.txt
+      - name: Install dependencies
+        run: poetry install
       - name: Run unit tests
-        run: python -m coverage run -a -m unittest discover -s tests -v
+        run: poetry run python -m coverage run -a -m unittest discover -s tests -v
       - name: Collect coverage report
         run: |
-          python -m coverage html
+          poetry run python -m coverage html
       - name: Publish coverage report to job summary
         run: |
           pip install html2text
