@@ -9,6 +9,8 @@ For testing this plugin you need a kubernets instance. Within CI we are using [K
 
 The test is going to read your kubeconfig file which defaults to `~/.kube/config`.
 
+The code requires Python >= 3.9 in order to work.
+
 ```console
 python -m venv .venv
 source .venv/bin/activate
