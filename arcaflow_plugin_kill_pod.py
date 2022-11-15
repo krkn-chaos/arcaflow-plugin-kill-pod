@@ -6,6 +6,7 @@ import time
 import typing
 import os
 import urllib3
+from urllib.parse import urlparse
 
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -16,8 +17,6 @@ from kubernetes import client, config
 from kubernetes.client import ApiException, V1DeleteOptions, V1Pod, V1PodList
 
 
-urllib3.disable_warnings()
-
 
 def setup_kubernetes(kubeconfig_path):
     if kubeconfig_path is None:
@@ -27,12 +26,12 @@ def setup_kubernetes(kubeconfig_path):
     http_proxy = os.getenv("http_proxy", None)
     """Proxy has auth header"""
     if http_proxy and "@" in http_proxy:
-        proxy_auth = http_proxy.split("@")[0].split("//")[1]
-        user_pass = proxy_auth.split(":")[0]
-        client_config.username = user_pass[0]
-        client_config.password = user_pass[1]
-    client_config.ssl_ca_cert = False
-    client_config.verify_ssl = False
+        proxy_auth = urlparse(http_proxy)
+        auth_string = proxy_auth.username + ":" +  proxy_auth.password
+        client_config.username = proxy_auth.username
+        client_config.password = proxy_auth.password
+
+
     kubeconfig = config.kube_config.KubeConfigMerger(kubeconfig_path)
 
     if kubeconfig.config is None:
@@ -47,7 +46,7 @@ def setup_kubernetes(kubeconfig_path):
     if proxy_url:
         client_config.proxy = proxy_url
         if proxy_auth:
-            client_config.proxy_headers = urllib3.util.make_headers(proxy_basic_auth=proxy_auth)
+            client_config.proxy_headers = urllib3.util.make_headers(proxy_basic_auth=auth_string)
 
     return client.ApiClient(configuration=client_config)
 
