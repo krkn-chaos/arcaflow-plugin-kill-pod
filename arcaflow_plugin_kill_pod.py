@@ -17,7 +17,6 @@ from kubernetes import client, config
 from kubernetes.client import ApiException, V1DeleteOptions, V1Pod, V1PodList
 
 
-
 def setup_kubernetes(kubeconfig_path):
     if kubeconfig_path is None:
         kubeconfig_path = config.KUBE_CONFIG_DEFAULT_LOCATION
@@ -27,10 +26,9 @@ def setup_kubernetes(kubeconfig_path):
     """Proxy has auth header"""
     if http_proxy and "@" in http_proxy:
         proxy_auth = urlparse(http_proxy)
-        auth_string = proxy_auth.username + ":" +  proxy_auth.password
+        auth_string = proxy_auth.username + ":" + proxy_auth.password
         client_config.username = proxy_auth.username
         client_config.password = proxy_auth.password
-
 
     kubeconfig = config.kube_config.KubeConfigMerger(kubeconfig_path)
 
