@@ -15,4 +15,7 @@ jobs:
       quay_img_exp: 'never'
       github_username: ${{ github.actor }}
       github_namespace: ${{ github.repository_owner }}
-    secrets: inherit
+    secrets: 
+      QUAY_NAMESPACE: ${{ secrets.QUAY_NAMESPACE }}
+      QUAY_USERNAME: ${{ secrets.QUAY_USERNAME }}
+      QUAY_PASSWORD: ${{ secrets.QUAY_PASSWORD }}
