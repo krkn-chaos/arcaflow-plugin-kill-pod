@@ -11,7 +11,7 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
 ]
-homepage = "https://github.com/arcalotarcaflow-plugin-kill-pod"
+homepage = "https://github.com/redhat-chaos/arcaflow-plugin-kill-pod"
 
 packages = [
    { include="arcaflow_plugin_kill_pod.py", from="."  },
