@@ -1,5 +1,5 @@
 version: '3.2'
 services:
   plugin:
-    image: ghcr.io/arcalot/arcaflow-plugin-kill-pod
+    image: ghcr.io/redhat-chaos/arcaflow-plugin-kill-pod
     build: .
