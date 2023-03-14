@@ -25,11 +25,11 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.9"
-arcaflow-plugin-sdk = "^0.9.0"
+arcaflow-plugin-sdk = "^0.10.0"
 kubernetes = "^25.3.0"
-
-[tool.poetry.dev-dependencies]
-coverage = "^6.5.0"
+arcaflow-lib-kubernetes = "^0.1.0"
+[tool.poetry.dev-dependencies] 
+coverage = "^7.2.1"
 pre-commit = "^2.20.0"
 
 [build-system]
