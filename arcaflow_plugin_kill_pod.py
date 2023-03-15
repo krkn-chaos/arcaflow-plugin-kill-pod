@@ -1,33 +1,34 @@
 #!/usr/bin/env python
+import os
 import random
 import re
 import sys
 import time
 import typing
+import arcaflow_lib_kubernetes
 from dataclasses import dataclass, field
 from datetime import datetime
 from traceback import format_exc
 
+import kubernetes.client
 from arcaflow_plugin_sdk import plugin, validation
 from kubernetes import client, config
 from kubernetes.client import ApiException, V1DeleteOptions, V1Pod, V1PodList
 
 
-def setup_kubernetes(kubeconfig_path):
-    if kubeconfig_path is None:
-        kubeconfig_path = config.KUBE_CONFIG_DEFAULT_LOCATION
-    kubeconfig = config.kube_config.KubeConfigMerger(kubeconfig_path)
-
-    if kubeconfig.config is None:
-        raise Exception(
-            "Invalid kube-config file: %s. " "No configuration found." % kubeconfig_path
-        )
-    loader = config.kube_config.KubeConfigLoader(
-        config_dict=kubeconfig.config,
-    )
-    client_config = client.Configuration()
-    loader.load_and_set(client_config)
-    return client.ApiClient(configuration=client_config)
+def setup_kubernetes(kubeconfig) -> kubernetes.client.ApiClient:
+    if kubeconfig is None:
+        try:
+            kubeconfig_path = config.KUBE_CONFIG_DEFAULT_LOCATION
+            if "~/" in kubeconfig_path:
+                kubeconfig_path = os.path.expanduser(kubeconfig_path)
+            with open(kubeconfig_path) as f:
+                kubeconfig = f.read()
+        except Exception as e:
+            raise Exception("impossible to read default kube-config: %s" % str(e))
+    kubeconfig = arcaflow_lib_kubernetes.parse_kubeconfig(kubeconfig)
+    connection = arcaflow_lib_kubernetes.kubeconfig_to_connection(kubeconfig)
+    return arcaflow_lib_kubernetes.connect(connection)
 
 
 def _find_pods(core_v1, label_selector, name_pattern, namespace_pattern):
@@ -126,11 +127,11 @@ class KillPodConfig:
         },
     )
 
-    kubeconfig_path: typing.Optional[str] = field(
+    kubeconfig: typing.Optional[str] = field(
         default=None,
         metadata={
             "name": "Kubeconfig path",
-            "description": "Path to your Kubeconfig file. Defaults to ~/.kube/config.\n"
+            "description": "Kubeconfig file as string\n"
             "See https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/ for "
             "details.",
         },
@@ -163,9 +164,8 @@ def kill_pods(
     cfg: KillPodConfig,
 ) -> typing.Tuple[str, typing.Union[PodKillSuccessOutput, PodErrorOutput]]:
     try:
-        with setup_kubernetes(None) as cli:
+        with setup_kubernetes(cfg.kubeconfig) as cli:
             core_v1 = client.CoreV1Api(cli)
-
             # region Select target pods
             pods = _find_pods(
                 core_v1, cfg.label_selector, cfg.name_pattern, cfg.namespace_pattern
@@ -263,7 +263,7 @@ class WaitForPodsConfig:
         },
     )
 
-    kubeconfig_path: typing.Optional[str] = None
+    kubeconfig: typing.Optional[str] = None
 
 
 @plugin.step(
@@ -276,7 +276,7 @@ def wait_for_pods(
     cfg: WaitForPodsConfig,
 ) -> typing.Tuple[str, typing.Union[PodWaitSuccessOutput, PodErrorOutput]]:
     try:
-        with setup_kubernetes(None) as cli:
+        with setup_kubernetes(cfg.kubeconfig) as cli:
             core_v1 = client.CoreV1Api(cli)
 
             timeout = False
