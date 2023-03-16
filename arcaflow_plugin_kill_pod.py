@@ -116,7 +116,6 @@ class KillPodConfig:
 
     label_selector: typing.Annotated[
         typing.Optional[str],
-        validation.min(1),
         validation.required_if_not("name_pattern"),
     ] = field(
         default=None,
