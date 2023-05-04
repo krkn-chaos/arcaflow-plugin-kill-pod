@@ -163,7 +163,7 @@ def kill_pods(
     cfg: KillPodConfig,
 ) -> typing.Tuple[str, typing.Union[PodKillSuccessOutput, PodErrorOutput]]:
     try:
-        with setup_kubernetes(None) as cli:
+        with setup_kubernetes(cfg.kubeconfig_path) as cli:
             core_v1 = client.CoreV1Api(cli)
 
             # region Select target pods
@@ -276,7 +276,7 @@ def wait_for_pods(
     cfg: WaitForPodsConfig,
 ) -> typing.Tuple[str, typing.Union[PodWaitSuccessOutput, PodErrorOutput]]:
     try:
-        with setup_kubernetes(None) as cli:
+        with setup_kubernetes(cfg.kubeconfig_path) as cli:
             core_v1 = client.CoreV1Api(cli)
 
             timeout = False
