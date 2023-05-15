@@ -285,7 +285,17 @@ def wait_for_pods(
                 pods = _find_pods(
                     core_v1, cfg.label_selector, cfg.name_pattern, cfg.namespace_pattern
                 )
-                if len(pods) >= cfg.count:
+                
+                ready_pods = 0
+                for pod in pods:
+                    ready = True
+                    for container in pod.status.container_statuses:
+                        if not container.ready:
+                            ready = False
+                    if ready:
+                        ready_pods += 1
+
+                if ready_pods >= cfg.count:
                     return "success", PodWaitSuccessOutput(
                         list(
                             map(
@@ -294,6 +304,8 @@ def wait_for_pods(
                             )
                         )
                     )
+
+
 
                 time.sleep(cfg.backoff)
 
