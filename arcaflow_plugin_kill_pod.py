@@ -285,7 +285,7 @@ def wait_for_pods(
                 pods = _find_pods(
                     core_v1, cfg.label_selector, cfg.name_pattern, cfg.namespace_pattern
                 )
-                
+
                 ready_pods = 0
                 for pod in pods:
                     ready = True
