@@ -72,17 +72,17 @@ class KillPodTest(unittest.TestCase):
                 )
             )
             pods = arcaflow_plugin_kill_pod._find_pods(core_v1, None,
-                    namespace_pattern=re.compile("^default$"),
-                    name_pattern=re.compile(
-                        "^" + re.escape(pod.metadata.name) + "$"
-                    ))
-            print("pods "+ str(pods))
+                        namespace_pattern=re.compile("^default$"),
+                        name_pattern=re.compile(
+                            "^" + re.escape(pod.metadata.name) + "$"
+                        ))
+            print("pods " + str(pods))
             while len(pods) == 0:
                 pods = arcaflow_plugin_kill_pod._find_pods(core_v1, None, namespace_pattern=re.compile("^default$"),
                     name_pattern=re.compile(
                             "^" + re.escape(pod.metadata.name) + "$"
                     ))
-                print("pods "+ str(pods))
+                print("pods " + str(pods))
 
             def remove_test_pod():
                 try:

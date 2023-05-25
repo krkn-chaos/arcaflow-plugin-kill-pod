@@ -310,8 +310,6 @@ def wait_for_pods(
                         )
                     )
 
-
-
                 time.sleep(cfg.backoff)
 
                 now_time = datetime.now()
