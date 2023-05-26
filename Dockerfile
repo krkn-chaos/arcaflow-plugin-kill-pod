@@ -8,6 +8,8 @@ COPY arcaflow_plugin_kill_pod.py /app
 COPY README.md /app/
 
 RUN python3.9 -m pip install poetry \
+ # FIX per https://github.com/python-poetry/poetry/issues/5977
+ && python3.9 -m poetry add certifi \
  && python3.9 -m poetry config virtualenvs.create false \
  && python3.9 -m poetry install --without dev \
  && python3.9 -m poetry export -f requirements.txt --output requirements.txt --without-hashes
