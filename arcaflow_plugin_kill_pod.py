@@ -288,9 +288,12 @@ def wait_for_pods(
                 ready_pods = 0
                 for pod in pods:
                     ready = True
-                    for container in pod.status.container_statuses:
-                        if not container.ready:
-                            ready = False
+                    if pod.status: 
+                        for container in pod.status.container_statuses:
+                            if not container.ready:
+                                ready = False
+                    else: 
+                        ready = False
                     if ready:
                         ready_pods += 1
 
