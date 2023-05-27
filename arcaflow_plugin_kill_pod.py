@@ -36,7 +36,10 @@ def _find_pods(core_v1, label_selector, name_pattern, namespace_pattern):
     finished = False
     while not finished:
         pod_response: V1PodList = core_v1.list_pod_for_all_namespaces(
-            watch=False, label_selector=label_selector
+            watch=False,
+            label_selector=label_selector,
+            field_selector="status.phase=Running",
+            _continue=_continue
         )
         for pod in pod_response.items:
             pod: V1Pod
@@ -115,7 +118,6 @@ class KillPodConfig:
 
     label_selector: typing.Annotated[
         typing.Optional[str],
-        validation.min(1),
         validation.required_if_not("name_pattern"),
     ] = field(
         default=None,
@@ -289,9 +291,12 @@ def wait_for_pods(
                 ready_pods = 0
                 for pod in pods:
                     ready = True
-                    for container in pod.status.container_statuses:
-                        if not container.ready:
-                            ready = False
+                    if pod.status: 
+                        for container in pod.status.container_statuses:
+                            if not container.ready:
+                                ready = False
+                    else: 
+                        ready = False
                     if ready:
                         ready_pods += 1
 
@@ -304,8 +309,6 @@ def wait_for_pods(
                             )
                         )
                     )
-
-
 
                 time.sleep(cfg.backoff)
 
@@ -329,3 +332,4 @@ if __name__ == "__main__":
             )
         )
     )
+
