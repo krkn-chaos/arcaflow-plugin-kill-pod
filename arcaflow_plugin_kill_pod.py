@@ -4,6 +4,10 @@ import re
 import sys
 import time
 import typing
+import os
+import urllib3
+from urllib.parse import urlparse
+
 from dataclasses import dataclass, field
 from datetime import datetime
 from traceback import format_exc
@@ -16,6 +20,16 @@ from kubernetes.client import ApiException, V1DeleteOptions, V1Pod, V1PodList
 def setup_kubernetes(kubeconfig_path):
     if kubeconfig_path is None:
         kubeconfig_path = config.KUBE_CONFIG_DEFAULT_LOCATION
+    """Initialize object and create clients from specified kubeconfig"""
+    client_config = client.Configuration()
+    http_proxy = os.getenv("http_proxy", None)
+    """Proxy has auth header"""
+    if http_proxy and "@" in http_proxy:
+        proxy_auth = urlparse(http_proxy)
+        auth_string = proxy_auth.username + ":" + proxy_auth.password
+        client_config.username = proxy_auth.username
+        client_config.password = proxy_auth.password
+
     kubeconfig = config.kube_config.KubeConfigMerger(kubeconfig_path)
 
     if kubeconfig.config is None:
@@ -23,10 +37,15 @@ def setup_kubernetes(kubeconfig_path):
             "Invalid kube-config file: %s. " "No configuration found." % kubeconfig_path
         )
     loader = config.kube_config.KubeConfigLoader(
-        config_dict=kubeconfig.config,
+        config_dict=kubeconfig.config, config_persister=True
     )
-    client_config = client.Configuration()
     loader.load_and_set(client_config)
+    proxy_url = http_proxy
+    if proxy_url:
+        client_config.proxy = proxy_url
+        if proxy_auth:
+            client_config.proxy_headers = urllib3.util.make_headers(proxy_basic_auth=auth_string)
+
     return client.ApiClient(configuration=client_config)
 
 
