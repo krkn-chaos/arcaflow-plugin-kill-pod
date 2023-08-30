@@ -206,7 +206,7 @@ def kill_pods(
                 new_watch_pods: typing.List[Pod] = []
                 for p in watch_pods:
                     try:
-                        read_pod = core_v1.read_namespaced_pod(p.name, p.namespace)
+                        read_pod = core_v1.read_namespaced_pod(p.name, p.namespace)                        
                         if read_pod.metadata.name != p.name:
                             return "error", PodErrorOutput(
                                 "Error retrieveing pod {}".format(p.name)
@@ -215,7 +215,6 @@ def kill_pods(
                             if read_pod.metadata.creation_timestamp.tzinfo > kill_time.tzinfo:
                                 p=[]
                             new_watch_pods.append(p)
-                        break                        
                     except ApiException as e:
                         if e.status != 404:
                             raise
