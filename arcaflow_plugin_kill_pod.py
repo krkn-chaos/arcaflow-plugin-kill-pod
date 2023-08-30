@@ -186,6 +186,7 @@ def kill_pods(
             watch_pods: typing.List[Pod] = []
             for i in range(cfg.kill):
                 pod = pods[i]
+                kill_time=(datetime.fromtimestamp(int((time.time_ns())//1000000000)))
                 core_v1.delete_namespaced_pod(
                     pod.metadata.name,
                     pod.metadata.namespace,
@@ -210,7 +211,11 @@ def kill_pods(
                             return "error", PodErrorOutput(
                                 "Error retrieveing pod {}".format(p.name)
                             )
-                        new_watch_pods.append(p)
+                        if read_pod.status.phase=='Running':
+                            if read_pod.metadata.creation_timestamp.tzinfo > kill_time.tzinfo:
+                                p=[]
+                            new_watch_pods.append(p)
+                        break                        
                     except ApiException as e:
                         if e.status != 404:
                             raise
