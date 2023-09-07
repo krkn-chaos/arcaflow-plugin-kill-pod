@@ -4,23 +4,12 @@ import re
 import sys
 import time
 import typing
-import logging
-import random
-import re
-import sys
-import time
-import krkn_lib_kubernetes
-import yaml
 from dataclasses import dataclass, field
 from datetime import datetime
 from traceback import format_exc
 from arcaflow_plugin_sdk import plugin, validation
 from kubernetes import client, config
 from kubernetes.client import ApiException, V1DeleteOptions, V1Pod, V1PodList
-from time import strftime, localtime
-from datetime import datetime
-# from ..cerberus import setup as cerberus
-from krkn_lib_kubernetes import ScenarioTelemetry, KrknTelemetry 
 
 def setup_kubernetes(kubeconfig_path):
     if kubeconfig_path is None:
