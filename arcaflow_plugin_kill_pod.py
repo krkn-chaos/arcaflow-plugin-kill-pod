@@ -4,14 +4,23 @@ import re
 import sys
 import time
 import typing
+import logging
+import random
+import re
+import sys
+import time
+import krkn_lib_kubernetes
+import yaml
 from dataclasses import dataclass, field
 from datetime import datetime
 from traceback import format_exc
-
 from arcaflow_plugin_sdk import plugin, validation
 from kubernetes import client, config
 from kubernetes.client import ApiException, V1DeleteOptions, V1Pod, V1PodList
-
+from time import strftime, localtime
+from datetime import datetime
+# from ..cerberus import setup as cerberus
+from krkn_lib_kubernetes import ScenarioTelemetry, KrknTelemetry 
 
 def setup_kubernetes(kubeconfig_path):
     if kubeconfig_path is None:
@@ -57,7 +66,7 @@ def _find_pods(core_v1, label_selector, name_pattern, namespace_pattern):
 class Pod:
     namespace: str
     name: str
-
+    creation_timestamp : str
 
 @dataclass
 class PodKillSuccessOutput:
@@ -186,7 +195,8 @@ def kill_pods(
             watch_pods: typing.List[Pod] = []
             for i in range(cfg.kill):
                 pod = pods[i]
-                kill_time=(datetime.fromtimestamp(int((time.time_ns())//1000000000)))
+                kill_time=time.time_ns()
+
                 core_v1.delete_namespaced_pod(
                     pod.metadata.name,
                     pod.metadata.namespace,
@@ -194,8 +204,9 @@ def kill_pods(
                         grace_period_seconds=0,
                     ),
                 )
-                p = Pod(pod.metadata.namespace, pod.metadata.name)
-                killed_pods[int(time.time_ns())] = p
+
+                p = Pod(pod.metadata.namespace, pod.metadata.name, str(pod.metadata.creation_timestamp))
+                killed_pods[kill_time] = p
                 watch_pods.append(p)
             # endregion
 
@@ -211,10 +222,9 @@ def kill_pods(
                             return "error", PodErrorOutput(
                                 "Error retrieveing pod {}".format(p.name)
                             )
-                        if read_pod.status.phase=='Running':
-                            if read_pod.metadata.creation_timestamp.tzinfo > kill_time.tzinfo:
-                                p=[]
-                            new_watch_pods.append(p)
+                        if str(read_pod.metadata.creation_timestamp.tzinfo) > p.creation_timestamp:
+                                continue
+                        new_watch_pods.append(p)
                     except ApiException as e:
                         if e.status != 404:
                             raise
@@ -308,7 +318,7 @@ def wait_for_pods(
                     return "success", PodWaitSuccessOutput(
                         list(
                             map(
-                                lambda p: Pod(p.metadata.namespace, p.metadata.name),
+                                lambda p: Pod(p.metadata.namespace, p.metadata.name, str(p.metadata.creation_timestamp)),
                                 pods,
                             )
                         )
