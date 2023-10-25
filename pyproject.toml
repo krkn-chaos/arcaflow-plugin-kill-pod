@@ -28,6 +28,7 @@ python = "^3.9"
 arcaflow-plugin-sdk = "^0.10.0"
 kubernetes = "^26.0.0"
 arcaflow-lib-kubernetes = "^0.1.0"
+cbor2 = "==5.4.6"
 [tool.poetry.dev-dependencies] 
 coverage = "^7.2.1"
 pre-commit = "^2.20.0"
