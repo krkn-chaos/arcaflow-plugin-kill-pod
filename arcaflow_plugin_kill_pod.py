@@ -129,7 +129,7 @@ class KillPodConfig:
     kubeconfig: typing.Optional[str] = field(
         default=None,
         metadata={
-            "name": "Kubeconfig path",
+            "name": "Kubeconfig",
             "description": "Kubeconfig file as string\n"
             "See https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/ for "
             "details.",
@@ -229,17 +229,34 @@ class WaitForPodsConfig:
     WaitForPodsConfig is a configuration structure for wait-for-pod steps.
     """
 
-    namespace_pattern: re.Pattern
+    namespace_pattern: re.Pattern = field(
+        metadata={
+            "name": "Namespace pattern",
+            "description": "Regular expression for target pod namespaces.",
+        }
+    )
 
     name_pattern: typing.Annotated[
         typing.Optional[re.Pattern], validation.required_if_not("label_selector")
-    ] = None
+    ] = field(
+        default=None,
+        metadata={
+            "name": "Name pattern",
+            "description": "Regular expression for target pods. Required if label_selector is not set.",
+        },
+    )
 
     label_selector: typing.Annotated[
         typing.Optional[str],
-        validation.min(1),
         validation.required_if_not("name_pattern"),
-    ] = None
+    ] = field(
+        default=None,
+        metadata={
+            "name": "Label selector",
+            "description": "Kubernetes label selector for the target pods. Required if name_pattern is not set.\n"
+            "See https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/ for details.",
+        },
+    )
 
     count: typing.Annotated[int, validation.min(1)] = field(
         default=1,
@@ -262,7 +279,15 @@ class WaitForPodsConfig:
         },
     )
 
-    kubeconfig: typing.Optional[str] = None
+    kubeconfig: typing.Optional[str] = field(
+        default=None,
+        metadata={
+            "name": "Kubeconfig",
+            "description": "Kubeconfig file as string\n"
+                           "See https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/ for "
+                           "details.",
+        },
+    )
 
 
 @plugin.step(
