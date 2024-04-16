@@ -17,7 +17,8 @@ class KillPodTest(unittest.TestCase):
     def test_serialization(self):
         plugin.test_object_serialization(
             arcaflow_plugin_kill_pod.KillPodConfig(
-                namespace_pattern=re.compile(".*"), name_pattern=re.compile(".*")
+                # added knkn_pod_recovery_time only for schema testing
+                namespace_pattern=re.compile(".*"), name_pattern=re.compile(".*"),krkn_pod_recovery_time=30
             ),
             self.fail,
         )

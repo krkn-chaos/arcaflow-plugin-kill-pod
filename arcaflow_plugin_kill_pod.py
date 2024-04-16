@@ -144,6 +144,14 @@ class KillPodConfig:
         },
     )
 
+    krkn_pod_recovery_time: int = field(
+        default=60,
+        metadata={
+            "name": "Recovery Time",
+            "description": "The Expected Recovery time fo the pod (used by Krkn to monitor the pod lifecycle)",
+        },
+    )
+
     backoff: int = field(
         default=1,
         metadata={
