@@ -33,11 +33,13 @@ class KillPodTest(unittest.TestCase):
 
     def test_not_enough_pods(self):
         name = "".join(random.choices(string.ascii_lowercase, k=8))
+
         output_id, output_data = arcaflow_plugin_kill_pod.kill_pods(
-            arcaflow_plugin_kill_pod.KillPodConfig(
+            params=arcaflow_plugin_kill_pod.KillPodConfig(
                 namespace_pattern=re.compile("^default$"),
                 name_pattern=re.compile("^unit-test-" + re.escape(name) + "$"),
-            )
+            ),
+            run_id="kill_pod-test_not_enough_pods",
         )
         if output_id != "error":
             self.fail("Not enough pods did not result in an error.")
@@ -99,10 +101,11 @@ class KillPodTest(unittest.TestCase):
             self.addCleanup(remove_test_pod)
 
             output_id, output_data = arcaflow_plugin_kill_pod.kill_pods(
-                arcaflow_plugin_kill_pod.KillPodConfig(
+                params=arcaflow_plugin_kill_pod.KillPodConfig(
                     namespace_pattern=re.compile("^default$"),
                     name_pattern=re.compile("^" + re.escape(pod.metadata.name) + "$"),
-                )
+                ),
+                run_id="kill_pod-remove_test_pod",
             )
 
             if output_id == "error":
@@ -150,11 +153,12 @@ class WaitForPodTest(unittest.TestCase):
     def test_timeout(self):
         name = "watch-test-" + "".join(random.choices(string.ascii_lowercase, k=8))
         output_id, output_data = arcaflow_plugin_kill_pod.wait_for_pods(
-            arcaflow_plugin_kill_pod.WaitForPodsConfig(
+            params=arcaflow_plugin_kill_pod.WaitForPodsConfig(
                 namespace_pattern=re.compile("^default$"),
                 name_pattern=re.compile("^" + re.escape(name) + "$"),
                 timeout=1,
-            )
+            ),
+            run_id="wait_for_pod-test_timeout",
         )
         self.assertEqual("error", output_id)
 
@@ -204,11 +208,12 @@ class WaitForPodTest(unittest.TestCase):
             t.start()
 
             output_id, output_data = arcaflow_plugin_kill_pod.wait_for_pods(
-                arcaflow_plugin_kill_pod.WaitForPodsConfig(
+                params=arcaflow_plugin_kill_pod.WaitForPodsConfig(
                     namespace_pattern=re.compile("^default$"),
                     name_pattern=re.compile("^" + re.escape(name) + "$"),
                     timeout=60,
-                )
+                ),
+                run_id="wait_for_pod-remove_test_pod",
             )
             self.assertEqual("success", output_id)
 
