@@ -1,6 +1,6 @@
 # build poetry
-FROM quay.io/centos/centos:stream8 as poetry
-RUN dnf -y module install python39 && dnf -y install python39 python39-pip
+FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-buildbase:0.4.0 as build
+
 WORKDIR /app
 
 COPY poetry.lock pyproject.toml /app/
@@ -15,21 +15,19 @@ RUN python3.9 -m pip install poetry \
  && python3.9 -m poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 # run tests
-COPY tests /app/tests
-
-# FIXME -- Tests do not currently pass
-#RUN mkdir /htmlcov
-#RUN pip3 install coverage
-#RUN python3 -m coverage run tests/test_arcaflow_plugin_kill_pod.py
-#RUN python3 -m coverage html -d /htmlcov --omit=/usr/local/*
+# FIXME cannot execute tests without a kubeconfig and kubernetes cluster
+# COPY tests /app/tests
+# RUN pip3 install coverage
+# RUN python3.9 -m coverage run tests/test_arcaflow_plugin_kill_pod.py
+# RUN python3.9 -m coverage html -d /htmlcov --omit=/usr/local/*
 
 #final image
-FROM quay.io/centos/centos:stream8
-RUN dnf -y module install python39 && dnf -y install python39 python39-pip
+FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-osbase:0.4.0
+
 WORKDIR /app
 
-COPY --from=poetry /app/requirements.txt /app/
-#COPY --from=poetry /htmlcov /htmlcov/
+COPY --from=build /app/requirements.txt /app/
+COPY --from=build /htmlcov /htmlcov/
 COPY LICENSE /app/
 COPY README.md /app/
 COPY arcaflow_plugin_kill_pod.py /app
