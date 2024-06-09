@@ -15,11 +15,11 @@ RUN python3.9 -m pip install poetry \
  && python3.9 -m poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 # run tests
-# FIXME cannot execute tests without a kubeconfig and kubernetes cluster
-# COPY tests /app/tests
-# RUN pip3 install coverage
-# RUN python3.9 -m coverage run tests/test_arcaflow_plugin_kill_pod.py
-# RUN python3.9 -m coverage html -d /htmlcov --omit=/usr/local/*
+# FIXME cannot execute tests without a kind cluster
+COPY tests /app/tests
+RUN pip3 install coverage
+RUN python3.9 -m coverage run tests/test_arcaflow_plugin_kill_pod.py
+RUN python3.9 -m coverage html -d /htmlcov --omit=/usr/local/*
 
 #final image
 FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-osbase:0.4.0
@@ -34,7 +34,7 @@ COPY arcaflow_plugin_kill_pod.py /app
 
 RUN python3.9 -m pip install -r requirements.txt
 
-ENTRYPOINT ["python3", "arcaflow_plugin_kill_pod.py"]
+#ENTRYPOINT ["python3", "arcaflow_plugin_kill_pod.py"]
 CMD []
 
 LABEL org.opencontainers.image.source="https://github.com/redhat-chaos/arcaflow-plugin-kill-pod"
