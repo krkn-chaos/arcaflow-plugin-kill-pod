@@ -34,8 +34,6 @@ idna = "^3.7"        # fixes cve-2024-35195
 coverage = "^6.5.0"
 pre-commit = "^2.20.0"
 
-[tool.poetry.group.cve-fixes.dependencies]
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
