@@ -1,5 +1,5 @@
 # build poetry
-FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-buildbase:0.4.0 as build
+FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-buildbase:0.4.2 as build
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ RUN python3.9 -m pip install poetry \
 #RUN python3.9 -m coverage html -d /htmlcov --omit=/usr/local/*
 
 #final image
-FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-osbase:0.4.0
+FROM quay.io/arcalot/arcaflow-plugin-baseimage-python-osbase:0.4.2
 
 WORKDIR /app
 
