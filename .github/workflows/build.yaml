@@ -10,11 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
       - name: Create multi-node KinD cluster
-        uses: redhat-chaos/actions/kind@main
+        uses: redhat-chaos/actions/kind@b3118123a105aa4d208b282639d24f71d02fb25c # main
       - name: Install Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4
         with:
           python-version: '3.9'
           architecture: 'x64'
@@ -23,7 +23,7 @@ jobs:
       - name: Test python build
         run: poetry build
       - name: Upload built artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3
         with:
           name: builds
           path: dist
@@ -40,7 +40,7 @@ jobs:
           pip install html2text
           html2text --ignore-images --ignore-links -b 0 htmlcov/index.html >> $GITHUB_STEP_SUMMARY
       - name: Upload coverage data
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@ff15f0306b3f739f7b6fd43fb5d26cd321bd4de5 # v3
         with:
           name: coverage
           path: htmlcov
@@ -51,7 +51,7 @@ jobs:
         run: docker-compose up
       - name: Rebuild krkn
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        uses: redhat-chaos/actions/krkn@main
+        uses: redhat-chaos/actions/krkn@b3118123a105aa4d208b282639d24f71d02fb25c # main
         with:
           QUAY_USER: ${{ secrets.QUAY_USERNAME }}
           QUAY_TOKEN: ${{ secrets.QUAY_PASSWORD }}

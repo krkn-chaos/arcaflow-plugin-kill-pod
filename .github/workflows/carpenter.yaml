@@ -8,7 +8,7 @@ on:
       - published
 jobs:
   carpenter:
-    uses: arcalot/arcaflow-reusable-workflows/.github/workflows/carpenter.yaml@main
+    uses: arcalot/arcaflow-reusable-workflows/.github/workflows/carpenter.yaml@a7dd316ed5085681cc8111d0f188428deb69b05d # main
     with:
       image_name: ${{ github.event.repository.name }}
       image_tag: 'latest'
